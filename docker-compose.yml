@@ -82,7 +82,6 @@ services:
       - back-tier
 
   pihole:
-    container_name: pihole
     image: pihole/pihole:latest
     ports:
       # DNS Ports
@@ -111,7 +110,6 @@ services:
 
   uptime-kuma:
     image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
     restart: always
     volumes:
       - uptime_kuma_data:/app/data
