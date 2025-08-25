@@ -1,8 +1,8 @@
-version: "3.1"
+version: "3.8"
 
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
+  prometheus_data: {}
+  grafana_data: {}
 
 networks:
   front-tier:
@@ -16,20 +16,17 @@ services:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
     ports:
-      - 9090:9090
-    links:
-      - ping:ping
-      - speedtest:speedtest
+      - "9090:9090"
     networks:
       - back-tier
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:8.1.2
     restart: always
     volumes:
       - grafana_data:/var/lib/grafana
@@ -37,7 +34,7 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3030:3000
+      - "3030:3000"
     env_file:
       - ./grafana/config.monitoring
     networks:
@@ -45,47 +42,38 @@ services:
       - front-tier
 
   ping:
-    tty: true
-    stdin_open: true
-    expose:
-      - 9115
-    ports:
-      - 9115:9115
-    image: prom/blackbox-exporter
+    image: prom/blackbox-exporter:latest
     restart: always
     volumes:
       - ./blackbox/config:/config
     command:
-      - '--config.file=/config/blackbox.yml'
+      - "--config.file=/config/blackbox.yml"
+    ports:
+      - "9115:9115"
     networks:
       - back-tier
 
   speedtest:
-    tty: true
-    stdin_open: true
-    expose:
-      - 9798
-    ports:
-      - 9798:9798
-    image: miguelndecarvalho/speedtest-exporter
+    image: miguelndecarvalho/speedtest-exporter:latest
     restart: always
+    ports:
+      - "9798:9798"
     networks:
       - back-tier
 
   nodeexp:
+    image: prom/node-exporter:latest
     privileged: true
-    image: prom/node-exporter
+    restart: always
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     ports:
-      - 9100:9100
-    restart: always
+      - "9100:9100"
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - --collector.filesystem.ignored-mount-points
-      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     networks:
       - back-tier
