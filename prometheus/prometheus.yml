@@ -1,76 +1,70 @@
 global:
-  scrape_interval:     15s # By default, scrape targets every 15 seconds.
-  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+  scrape_interval: 30s
+  evaluation_interval: 30s
   # scrape_timeout is set to the global default (10s).
   external_labels:
-      monitor: 'Alertmanager'
+    monitor: "Alertmanager"
 
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
 rule_files:
-    - 'alert.rules'
+  - "alert.rules"
 
 scrape_configs:
-  - job_name: 'prometheus'
-    scrape_interval: 5s
+  - job_name: "prometheus"
+    scrape_interval: 15s
     static_configs:
-         - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
-  - job_name: 'speedtest'
+  - job_name: "speedtest"
     metrics_path: /metrics
-    scrape_interval: 30m
-    scrape_timeout: 60s # running speedtest needs time to complete
+    scrape_interval: 10m
+    scrape_timeout: 120s # running speedtest needs time to complete
     static_configs:
-      - targets: ['speedtest:9798']
+      - targets: ["speedtest:9798"]
 
-  # This job config only works with my internet-pi configuration currently,
-  # if you also have the shelly plug enabled there. It will just error out
-  # by default if you don't have a Shelly Plug on your network. Someday I'll
-  # work on making this more configurable...
-  - job_name: 'shelly-plug'
+  - job_name: "shelly-plug"
+    metrics_path: /metrics
+    scrape_interval: 2m
+    static_configs:
+      - targets: ["172.17.0.1:9924"]
+
+  - job_name: "starlink"
     metrics_path: /metrics
     scrape_interval: 1m
     static_configs:
-      - targets: ['172.17.0.1:9924']
+      - targets: ["172.17.0.1:9817"]
 
-  # This job config only works with my internet-pi configuration currently,
-  # if you also have starlink enabled there. It will just error out by default
-  # if you don't have Starlink. Someday I'll work on making this more
-  # configurable...
-  - job_name: 'starlink'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['172.17.0.1:9817']
-
-  - job_name: 'ping'
+  - job_name: "ping"
     metrics_path: /probe
-    scrape_interval: 5s
+    scrape_interval: 15s
     params:
-      module: [http_2xx]  # Look for a HTTP 200 response.
+      module: [http_2xx] # Look for a HTTP 200 response.
     file_sd_configs:
       - files:
-        - pinghosts.yaml
+          - pinghosts.yaml
     relabel_configs:
       - source_labels: [__address__]
-        regex: '(.*);(.*);(.*);(.*)'  #first is the url, thus unique for instance
+        regex: "(.*);(.*);(.*);(.*)" #first is the url, thus unique for instance
         target_label: instance
         replacement: $1
       - source_labels: [__address__]
-        regex: '(.*);(.*);(.*);(.*)'  #second is humanname to use in charts
+        regex: "(.*);(.*);(.*);(.*)" #second is humanname to use in charts
         target_label: humanname
         replacement: $2
       - source_labels: [__address__]
-        regex: '(.*);(.*);(.*);(.*)'  #third state whether this is testing external or internal network
+        regex: "(.*);(.*);(.*);(.*)" #third state whether this is testing external or internal network
         target_label: routing
         replacement: $3
       - source_labels: [__address__]
-        regex: '(.*);(.*);(.*);(.*)'  #fourth is which switch/router the device is connected to.
+        regex: "(.*);(.*);(.*);(.*)" #fourth is which switch/router the device is connected to.
         target_label: switching
         replacement: $4
       - source_labels: [instance]
         target_label: __param_target
       - target_label: __address__
-        replacement: ping:9115  # The blackbox exporter's real hostname:port.
+        replacement: ping:9115 # The blackbox exporter's real hostname:port.
 
-  - job_name: 'nodeexp'
+  - job_name: "nodeexp"
+    scrape_interval: 30s
     static_configs:
-    - targets: ['nodeexp:9100']
+      - targets: ["nodeexp:9100"]

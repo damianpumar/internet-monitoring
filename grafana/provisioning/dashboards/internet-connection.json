@@ -66,9 +66,7 @@
       "options": {
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -81,7 +79,7 @@
         {
           "expr": "speedtest_download_bits_per_second{}",
           "format": "time_series",
-          "interval": "",
+          "interval": "5m",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -137,9 +135,7 @@
       "options": {
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -152,7 +148,7 @@
         {
           "expr": "speedtest_upload_bits_per_second{}",
           "format": "time_series",
-          "interval": "",
+          "interval": "5m",
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -209,9 +205,7 @@
       "options": {
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -517,10 +511,7 @@
   "refresh": "5m",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": [
-    "speedtest",
-    "ping"
-  ],
+  "tags": ["speedtest", "ping"],
   "templating": {
     "list": []
   },
@@ -541,17 +532,7 @@
       "2h",
       "1d"
     ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
   "title": "Internet connection",
