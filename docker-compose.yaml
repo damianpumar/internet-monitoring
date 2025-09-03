@@ -15,6 +15,7 @@ networks:
 services:
   prometheus:
     image: prom/prometheus:v2.25.2
+    user: "0"
     restart: always
     volumes:
       - ./prometheus/:/etc/prometheus/
@@ -31,6 +32,7 @@ services:
 
   grafana:
     image: grafana/grafana:8.1.2
+    user: "0"
     restart: always
     volumes:
       - grafana_data:/var/lib/grafana
@@ -83,35 +85,6 @@ services:
     networks:
       - back-tier
 
-  pihole:
-    image: pihole/pihole:latest
-    ports:
-      # DNS Ports
-      - "53:53/tcp"
-      - "53:53/udp"
-      # Default HTTP Port
-      - "3031:80/tcp"
-      # Default HTTPs Port. FTL will generate a self-signed certificate
-      # - "443:443/tcp"
-      # Uncomment the line below if you are using Pi-hole as your DHCP server
-      #- "67:67/udp"
-      # Uncomment the line below if you are using Pi-hole as your NTP server
-      #- "123:123/udp"
-    environment:
-      TZ: "Europe/Madrid"
-      FTLCONF_webserver_api_password: "admin"
-      FTLCONF_dns_listeningMode: "all"
-    volumes:
-      - "./etc-pihole:/etc/pihole"
-      # - './etc-dnsmasq.d:/etc/dnsmasq.d' # si usás configuración custom
-    cap_add:
-      - NET_ADMIN
-      - SYS_TIME
-      - SYS_NICE
-    restart: unless-stopped
-    networks:
-      - back-tier
-
   uptime-kuma:
     image: louislam/uptime-kuma:1
     restart: always
@@ -122,19 +95,3 @@ services:
     networks:
       - front-tier
       - back-tier
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx_proxy_monitoring
-    restart: unless-stopped
-    networks:
-      - back-tier
-      - front-tier
-    ports:
-      - 8081:80
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - grafana
-      - pihole
-      - uptime-kuma
